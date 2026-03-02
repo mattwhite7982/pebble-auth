@@ -52,25 +52,36 @@
     </div>
 
     <script>
-        function startAuth() {
-            var clientID = document.getElementById('client-id').value.trim();
-            if (!clientID) {
-                alert("Please paste your Client ID first!");
-                return;
-            }
+  // 1. Auto-fill the Client ID if it's in the URL
+window.onload = function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var savedId = urlParams.get('client_id');
+    if (savedId) {
+        document.getElementById('client-id').value = savedId;
+        console.log("Auto-filled saved Client ID");
+    }
+};
 
-            var redirect = encodeURIComponent("https://mattwhite7982.github.io/pebble-auth/");
-            var scope = encodeURIComponent("https://www.googleapis.com/auth/gmail.readonly");
-            
-            // Build the Google OAuth URL
-            var url = "https://accounts.google.com/o/oauth2/v2/auth" +
-                      "?client_id=" + clientID +
-                      "&redirect_uri=" + redirect +
-                      "&response_type=token" +
-                      "&scope=" + scope;
+function startAuth() {
+    var clientID = document.getElementById('client-id').value.trim();
+    if (!clientID) {
+        alert("Please paste your Client ID first!");
+        return;
+    }
 
-            window.location.href = url;
-        }
+    var redirect = encodeURIComponent("https://mattwhite7982.github.io/pebble-auth/");
+    var scope = encodeURIComponent("https://www.googleapis.com/auth/gmail.readonly");
+    
+    // We add &client_id to the hash so the Pebble JS can 'see' it and save it
+    var url = "https://accounts.google.com/o/oauth2/v2/auth" +
+              "?client_id=" + clientID +
+              "&redirect_uri=" + redirect +
+              "&response_type=token" +
+              "&scope=" + scope +
+              "&state=" + encodeURIComponent("client_id=" + clientID); // Pass ID through state
+
+    window.location.href = url;
+}
     </script>
 </body>
 </html>
