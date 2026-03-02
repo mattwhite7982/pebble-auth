@@ -4,36 +4,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pebble Login</title>
 </head>
-<body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
-    <h1 id="status">Linking to Pebble...</h1>
-    
-    <button id="manual-btn" style="padding: 20px 40px; font-size: 20px; background-color: #FF5500; color: white; border: none; border-radius: 10px; display: none;">
-        TAP TO FINISH LOGIN
-    </button>
+<body style="text-align: center; padding-top: 50px; font-family: sans-serif;">
+  <h1>Link Found!</h1>
+  <p>If the app doesn't resume, tap below:</p>
+  
+  <a id="return-link" href="#" style="display: inline-block; padding: 20px; background: #FF5500; color: white; text-decoration: none; border-radius: 10px; font-weight: bold;">
+    RETURN TO PEBBLE APP
+  </a>
 
-    <script>
-        function finish() {
-            var hash = window.location.hash;
-            if (hash.indexOf('access_token') !== -1) {
-                // The magic link that talks to the Pebble App
-                var target = "pebblejs://close#" + encodeURIComponent(hash.substring(1));
-                window.location.href = target;
-                document.getElementById('status').innerHTML = "Token Found! Redirecting...";
-            } else {
-                document.getElementById('status').innerHTML = "Error: No Token in URL";
-                alert("Check your Google Cloud Redirect URI settings.");
-            }
-        }
+  <script>
+    function getPebbleLink() {
+      var hash = window.location.hash;
+      if (hash.indexOf('access_token') !== -1) {
+        // Strip the '#' and create the deep link
+        return "pebblejs://close#" + encodeURIComponent(hash.substring(1));
+      }
+      return null;
+    }
 
-        // Try to close automatically
-        setTimeout(finish, 1000);
-
-        // Show the button as a fallback if auto-close fails
-        setTimeout(function() {
-            document.getElementById('manual-btn').style.display = "inline-block";
-        }, 1500);
-
-        document.getElementById('manual-btn').onclick = finish;
-    </script>
+    var link = getPebbleLink();
+    if (link) {
+      var el = document.getElementById('return-link');
+      el.href = link; // Set the actual protocol link here
+      
+      // Attempt auto-redirect
+      setTimeout(function() { window.location.href = link; }, 1000);
+    } else {
+      document.body.innerHTML = "<h1>Error: No Token</h1><p>Google didn't send the data.</p>";
+    }
+  </script>
 </body>
-</html>
