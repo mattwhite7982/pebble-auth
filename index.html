@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Pebble Auth Helper</title></head>
+<body>
+  <h1>Logging you in...</h1>
+  <script>
+    // This script grabs the #access_token from the URL and 
+    // sends it back to the Pebble phone app.
+    var hash = window.location.hash;
+    if (hash.indexOf('access_token') !== -1) {
+        // Send the full URL back to the Pebble app
+        // This triggers the 'webviewclosed' event in your index.js
+        window.location.href = "pebblejs://close#" + encodeURIComponent(hash);
+    } else {
+        document.body.innerHTML = "<h1>Error: No token found in URL.</h1>";
+    }
+  </script>
+</body>
+</html>
