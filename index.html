@@ -1,31 +1,76 @@
 <!DOCTYPE html>
 <html>
-<body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
-  <div id="content">
-    <h1>Connecting...</h1>
-  </div>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pebble Gmail Setup</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; line-height: 1.5; padding: 20px; color: #333; background-color: #f9f9f9; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1 { font-size: 1.4em; color: #4285F4; margin-top: 0; }
+        h2 { font-size: 1.1em; margin-bottom: 10px; }
+        ol { padding-left: 20px; font-size: 0.9em; }
+        li { margin-bottom: 8px; }
+        code { background: #eee; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; word-break: break-all; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; margin-top: 10px; }
+        .btn { display: block; width: 100%; padding: 14px; background: #4285F4; color: white; text-align: center; text-decoration: none; border-radius: 6px; font-weight: bold; border: none; margin-top: 15px; cursor: pointer; }
+        .btn:active { background: #357ae8; }
+        .note { font-size: 0.8em; color: #666; margin-top: 10px; font-style: italic; }
+    </style>
+</head>
+<body>
 
-  <script>
-    var hash = window.location.hash;
-    if (hash.indexOf('access_token') !== -1) {
-        // Step 1: Show Success to the user
-        document.getElementById('content').innerHTML = 
-          "<h1 style='color: green;'>✅ Login Successful!</h1>" +
-          "<p>Your Google account is linked. This window should close shortly.</p>" +
-          "<button onclick='manualClose()' style='padding:10px;'>Close Manually</button>";
+    <div class="card">
+        <h1>Google Setup Guide</h1>
+        <p>To use this app for free, you must create your own "Google Project" (takes 5 mins).</p>
+        
+        <ol>
+            <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> on a PC.</li>
+            <li>Create a <strong>New Project</strong>.</li>
+            <li>Search for <strong>"Gmail API"</strong> and click <strong>Enable</strong>.</li>
+            <li>Go to <strong>OAuth Consent Screen</strong>:
+                <ul>
+                    <li>Set User Type to <strong>External</strong>.</li>
+                    <li>Add <code>https://www.googleapis.com/auth/gmail.readonly</code> to Scopes.</li>
+                    <li>Add your own email to <strong>Test Users</strong>.</li>
+                </ul>
+            </li>
+            <li>Go to <strong>Credentials</strong> > <strong>Create Credentials</strong> > <strong>OAuth Client ID</strong>:
+                <ul>
+                    <li>Application Type: <strong>Web Application</strong>.</li>
+                    <li>Authorized Redirect URI: <code>https://mattwhite7982.github.io/pebble-auth/</code></li>
+                </ul>
+            </li>
+            <li>Copy the <strong>Client ID</strong> and paste it below.</li>
+        </ol>
+    </div>
 
-        // Step 2: Prepare the link back to the Pebble App
-        var returnLink = "pebblejs://close#" + encodeURIComponent(hash.substring(1));
+    <div class="card">
+        <h2>Link Your Account</h2>
+        <input type="text" id="client-id" placeholder="Paste Client ID here...">
+        <button class="btn" onclick="startAuth()">LOGIN WITH GMAIL</button>
+        <p class="note">Note: You will see a "Google hasn't verified this app" warning. Click <strong>Advanced</strong> > <strong>Go to [App] (unsafe)</strong> to proceed.</p>
+    </div>
 
-        function manualClose() {
-          window.location.href = returnLink;
+    <script>
+        function startAuth() {
+            var clientID = document.getElementById('client-id').value.trim();
+            if (!clientID) {
+                alert("Please paste your Client ID first!");
+                return;
+            }
+
+            var redirect = encodeURIComponent("https://mattwhite7982.github.io/pebble-auth/");
+            var scope = encodeURIComponent("https://www.googleapis.com/auth/gmail.readonly");
+            
+            // Build the Google OAuth URL
+            var url = "https://accounts.google.com/o/oauth2/v2/auth" +
+                      "?client_id=" + clientID +
+                      "&redirect_uri=" + redirect +
+                      "&response_type=token" +
+                      "&scope=" + scope;
+
+            window.location.href = url;
         }
-
-        // Step 3: Try to close automatically after 2 seconds
-        setTimeout(manualClose, 2000);
-    } else {
-        document.getElementById('content').innerHTML = "<h1>Error: No token received.</h1>";
-    }
-  </script>
+    </script>
 </body>
 </html>
