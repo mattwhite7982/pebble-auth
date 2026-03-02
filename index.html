@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head><title>Pebble Auth Helper</title></head>
-<body>
-  <h1>Logging you in...</h1>
+<head><title>Pebble Auth Success</title></head>
+<body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
+  <h1>Connection Successful!</h1>
+  <p>If this window doesn't close automatically, tap the button below:</p>
+  
+  <button id="close-btn" style="padding: 20px 40px; font-size: 20px; background-color: #FF5500; color: white; border: none; border-radius: 10px;">
+    Return to Pebble App
+  </button>
+
   <script>
-    // This script grabs the #access_token from the URL and 
-    // sends it back to the Pebble phone app.
-    var hash = window.location.hash;
-    if (hash.indexOf('access_token') !== -1) {
-        // Send the full URL back to the Pebble app
-        // This triggers the 'webviewclosed' event in your index.js
-        window.location.href = "pebblejs://close#" + encodeURIComponent(hash);
-    } else {
-        document.body.innerHTML = "<h1>Error: No token found in URL.</h1>";
+    function finishLogin() {
+        var hash = window.location.hash;
+        if (hash.indexOf('access_token') !== -1) {
+            // We strip the '#' and send the rest to the Pebble app
+            var tokenData = hash.substring(1); 
+            window.location.href = "pebblejs://close#" + tokenData;
+        } else {
+            document.body.innerHTML = "<h1>Error: No token found.</h1>";
+        }
     }
+
+    // Try to close automatically after 1 second
+    setTimeout(finishLogin, 1000);
+
+    // Manual click listener
+    document.getElementById('close-btn').onclick = finishLogin;
   </script>
 </body>
 </html>
