@@ -1,36 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pebble Login</title>
-</head>
-<body style="text-align: center; padding-top: 50px; font-family: sans-serif;">
-  <h1>Link Found!</h1>
-  <p>If the app doesn't resume, tap below:</p>
-  
-  <a id="return-link" href="#" style="display: inline-block; padding: 20px; background: #FF5500; color: white; text-decoration: none; border-radius: 10px; font-weight: bold;">
-    RETURN TO PEBBLE APP
-  </a>
+<body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
+  <div id="content">
+    <h1>Connecting...</h1>
+  </div>
 
   <script>
-    function getPebbleLink() {
-      var hash = window.location.hash;
-      if (hash.indexOf('access_token') !== -1) {
-        // Strip the '#' and create the deep link
-        return "pebblejs://close#" + encodeURIComponent(hash.substring(1));
-      }
-      return null;
-    }
+    var hash = window.location.hash;
+    if (hash.indexOf('access_token') !== -1) {
+        // Step 1: Show Success to the user
+        document.getElementById('content').innerHTML = 
+          "<h1 style='color: green;'>✅ Login Successful!</h1>" +
+          "<p>Your Google account is linked. This window should close shortly.</p>" +
+          "<button onclick='manualClose()' style='padding:10px;'>Close Manually</button>";
 
-    var link = getPebbleLink();
-    if (link) {
-      var el = document.getElementById('return-link');
-      el.href = link; // Set the actual protocol link here
-      
-      // Attempt auto-redirect
-      setTimeout(function() { window.location.href = link; }, 1000);
+        // Step 2: Prepare the link back to the Pebble App
+        var returnLink = "pebblejs://close#" + encodeURIComponent(hash.substring(1));
+
+        function manualClose() {
+          window.location.href = returnLink;
+        }
+
+        // Step 3: Try to close automatically after 2 seconds
+        setTimeout(manualClose, 2000);
     } else {
-      document.body.innerHTML = "<h1>Error: No Token</h1><p>Google didn't send the data.</p>";
+        document.getElementById('content').innerHTML = "<h1>Error: No token received.</h1>";
     }
   </script>
 </body>
+</html>
