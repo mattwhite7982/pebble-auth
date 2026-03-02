@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html>
-<head><title>Pebble Auth Success</title></head>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pebble Login</title>
+</head>
 <body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
-  <h1>Connection Successful!</h1>
-  <p>If this window doesn't close automatically, tap the button below:</p>
-  
-  <button id="close-btn" style="padding: 20px 40px; font-size: 20px; background-color: #FF5500; color: white; border: none; border-radius: 10px;">
-    Return to Pebble App
-  </button>
+    <h1 id="status">Linking to Pebble...</h1>
+    
+    <button id="manual-btn" style="padding: 20px 40px; font-size: 20px; background-color: #FF5500; color: white; border: none; border-radius: 10px; display: none;">
+        TAP TO FINISH LOGIN
+    </button>
 
-  <script>
-    function finishLogin() {
-        var hash = window.location.hash;
-        if (hash.indexOf('access_token') !== -1) {
-            // We strip the '#' and send the rest to the Pebble app
-            var tokenData = hash.substring(1); 
-            window.location.href = "pebblejs://close#" + tokenData;
-        } else {
-            document.body.innerHTML = "<h1>Error: No token found.</h1>";
+    <script>
+        function finish() {
+            var hash = window.location.hash;
+            if (hash.indexOf('access_token') !== -1) {
+                // The magic link that talks to the Pebble App
+                var target = "pebblejs://close#" + encodeURIComponent(hash.substring(1));
+                window.location.href = target;
+                document.getElementById('status').innerHTML = "Token Found! Redirecting...";
+            } else {
+                document.getElementById('status').innerHTML = "Error: No Token in URL";
+                alert("Check your Google Cloud Redirect URI settings.");
+            }
         }
-    }
 
-    // Try to close automatically after 1 second
-    setTimeout(finishLogin, 1000);
+        // Try to close automatically
+        setTimeout(finish, 1000);
 
-    // Manual click listener
-    document.getElementById('close-btn').onclick = finishLogin;
-  </script>
+        // Show the button as a fallback if auto-close fails
+        setTimeout(function() {
+            document.getElementById('manual-btn').style.display = "inline-block";
+        }, 1500);
+
+        document.getElementById('manual-btn').onclick = finish;
+    </script>
 </body>
 </html>
